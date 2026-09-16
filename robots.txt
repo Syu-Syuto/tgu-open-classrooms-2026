@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://syu-syuto.github.io/tgu-open-classrooms-2026/sitemap.xml

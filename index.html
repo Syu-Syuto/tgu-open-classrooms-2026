@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="東京学芸大学の2026年度の空き教室を、曜日・時限から簡単に検索できる非公式Webサイトです。">
+  <meta name="theme-color" content="#12324b">
+  <title>東京学芸大学 空き教室検索｜2026年度・非公式</title>
+  <link rel="canonical" href="https://syu-syuto.github.io/tgu-open-classrooms-2026/">
+  <meta property="og:title" content="東京学芸大学 空き教室検索｜2026年度・非公式">
+  <meta property="og:description" content="東京学芸大学の2026年度の空き教室を、曜日・時限から簡単に検索できる非公式Webサイトです。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://syu-syuto.github.io/tgu-open-classrooms-2026/">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312324b'/%3E%3Cpath d='M15 18h34v30H15z' fill='%23fff'/%3E%3Cpath d='M22 25h7v7h-7zm13 0h7v7h-7zM22 37h7v7h-7zm13 0h7v11h-7z' fill='%230aa7a2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "東京学芸大学 空き教室検索",
+    "alternateName": "学芸大 空き教室検索",
+    "url": "https://syu-syuto.github.io/tgu-open-classrooms-2026/",
+    "description": "東京学芸大学の2026年度の空き教室を曜日・時限から検索できる非公式Webサイトです。",
+    "inLanguage": "ja"
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div>
+      <p class="eyebrow">UNOFFICIAL CLASSROOM TOOL</p>
+      <h1>東京学芸大学 空き教室検索</h1>
+    </div>
+    <p class="data-note">2026年度</p>
+  </header>
+
+  <main>
+    <section class="search-panel" aria-labelledby="search-title">
+      <div class="search-intro">
+        <div>
+          <p class="section-kicker">FIND A ROOM</p>
+          <h2 id="search-title">いつ、どこが空いてる？</h2>
+        </div>
+        <button id="nowButton" class="now-button" type="button">
+          <span class="now-icon" aria-hidden="true">◎</span>
+          現在から探す
+        </button>
+      </div>
+
+      <p class="site-summary">東京学芸大学の2026年度シラバス・時間割データをもとに、曜日・時限から空き教室を探せる非公式ツールです。</p>
+
+      <div class="filters">
+        <label class="field term-field">
+          <span>開講期</span>
+          <select id="termSelect">
+            <option value="1">第1ターム（春学期を含む）</option>
+            <option value="2">第2ターム（春学期を含む）</option>
+            <option value="3">第3ターム（秋学期を含む）</option>
+            <option value="4">第4ターム（秋学期を含む）</option>
+          </select>
+          <small id="termAutoNote" class="term-auto-note" aria-live="polite"></small>
+        </label>
+
+        <fieldset class="field day-field">
+          <legend>曜日</legend>
+          <div id="dayButtons" class="choice-row" aria-label="曜日を選択">
+            <button type="button" data-day="月">月</button>
+            <button type="button" data-day="火">火</button>
+            <button type="button" data-day="水">水</button>
+            <button type="button" data-day="木">木</button>
+            <button type="button" data-day="金">金</button>
+            <button type="button" data-day="土">土</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="field period-field">
+          <legend>時限</legend>
+          <div id="periodButtons" class="choice-row period-row" aria-label="時限を選択">
+            <button type="button" data-period="1">1</button>
+            <button type="button" data-period="2">2</button>
+            <button type="button" data-period="3">3</button>
+            <button type="button" data-period="4">4</button>
+            <button type="button" data-period="5">5</button>
+            <button type="button" data-period="6">6</button>
+            <button type="button" data-period="7">7</button>
+          </div>
+        </fieldset>
+      </div>
+    </section>
+
+    <section class="results-section" aria-live="polite" aria-busy="true">
+      <div class="results-heading">
+        <div>
+          <p id="resultContext" class="section-kicker">読み込み中</p>
+          <h2><span id="resultCount">—</span>室が空いています</h2>
+        </div>
+        <p class="legend"><span></span>選択した時限から利用可能</p>
+      </div>
+      <div id="results" class="building-list">
+        <div class="loading-card">授業データを読み込んでいます…</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>このサイトは、東京学芸大学の2026年度シラバス・時間割データをもとに空き教室を検索するための非公式ツールです。大学公式サイトではなく、実際の空室・利用可否や掲載情報の正確性を保証するものではありません。休講・補講・教室変更には対応していません。</p>
+      <p class="contact-note">修正依頼・バグ報告：<a href="https://x.com/TKG_takazi" target="_blank" rel="noopener noreferrer">X（旧Twitter）@TKG_takazi</a> または <a href="https://www.instagram.com/tkg_syu/" target="_blank" rel="noopener noreferrer">Instagram @tkg_syu</a></p>
+    </div>
+  </footer>
+
+  <dialog id="roomDialog" class="room-dialog">
+    <form method="dialog"><button class="dialog-close" aria-label="閉じる">×</button></form>
+    <div id="dialogContent"></div>
+  </dialog>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
