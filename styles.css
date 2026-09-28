@@ -173,7 +173,7 @@ main { width: min(1160px, calc(100% - 32px)); margin: 32px auto 72px; }
 footer { padding: 26px 24px; background: var(--navy); color: #c5d5df; text-align: center; font-size: .8rem; }
 .footer-inner { width: min(860px, 100%); margin: 0 auto; }
 footer p { margin: 0; }
-.contact-note { margin-top: 10px; }
+.data-update-note, .contact-note { margin-top: 10px; }
 footer a { color: #8ce8e1; text-underline-offset: 3px; }
 footer a:hover { color: #fff; }
 

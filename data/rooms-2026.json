@@ -1,11 +1,14 @@
 {
   "metadata": {
     "year": 2026,
-    "inputRows": 2738,
-    "standardRoomCourseRecords": 1891,
-    "supplementRecords": 25,
-    "excludedNonStandardRoomRows": 872,
-    "parseIssueCount": 0,
+    "source": "https://gportal.u-gakugei.ac.jp/syllabus/search",
+    "sourceRetrievedAt": "2026-09-28T06:10:20.667980+00:00",
+    "generatedAt": "2026-09-28T06:29:41.204228+00:00",
+    "inputRows": 4809,
+    "standardRoomCourseRecords": 1907,
+    "standardRoomMeetingRecords": 1910,
+    "excludedNonStandardOrUnscheduledRows": 2902,
+    "parseIssueCount": 5,
     "roomCount": 72,
     "roomsByBuilding": {
       "C": 11,
