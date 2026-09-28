@@ -237,8 +237,8 @@ async function init() {
 
   try {
     const [scheduleResponse, roomsResponse] = await Promise.all([
-      fetch("./data/room-schedule-2026.json"),
-      fetch("./data/rooms-2026.json"),
+      fetch("./data/room-schedule-2026.json?v=20260928"),
+      fetch("./data/rooms-2026.json?v=20260928"),
     ]);
     if (!scheduleResponse.ok || !roomsResponse.ok) throw new Error("data request failed");
     state.data = await scheduleResponse.json();
