@@ -12,6 +12,20 @@
   --shadow: 0 16px 42px rgba(22, 49, 68, .10);
 }
 
+.personal-panel { margin-bottom: 24px; }
+.personal-panel h2 { font-size: 1.4rem; }
+#personalUpcoming { margin-top: 18px; overflow-wrap: anywhere; }
+.personal-class { padding: 12px 16px; margin: 12px 0; background: var(--teal-soft); border-radius: 12px; }
+.personal-class p { margin: 6px 0; }
+.timetable-body { padding: 24px; }
+.timetable-body input, .timetable-body select { display: block; width: 100%; min-height: 44px; margin: 6px 0 12px; padding: 8px; font: inherit; border: 1px solid var(--line); border-radius: 8px; }
+.timetable-fields { display: grid; gap: 6px; }
+#courseMatches { max-height: 240px; overflow: auto; margin-bottom: 16px; }
+#courseMatches button { display: block; width: 100%; padding: 12px; text-align: left; background: var(--paper); border: 1px solid var(--line); color: var(--ink); }
+#courseMatches small { display: block; }
+.personal-entry { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.timetable-body button:not(.now-button) { min-height: 44px; font: inherit; }
+
 * { box-sizing: border-box; }
 
 body {

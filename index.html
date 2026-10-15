@@ -47,6 +47,11 @@
   </header>
 
   <main>
+    <section class="search-panel personal-panel" aria-labelledby="personal-title">
+      <div class="search-intro"><h2 id="personal-title">自分の時間割</h2><button id="editTimetable" class="now-button" type="button">登録・編集</button></div>
+      <div id="personalUpcoming" role="status">登録した時間割から、現在・次の授業と教室を表示します。</div>
+      <p class="term-auto-note">時間割はこの端末のブラウザ内に保存します。運営者には送信しません。休講・補講・教室変更は大学のお知らせをご確認ください。</p>
+    </section>
     <section class="search-panel" aria-labelledby="search-title">
       <div class="search-intro">
         <div>
@@ -129,5 +134,6 @@
   </dialog>
 
   <script src="./app.js?v=20260928" defer></script>
+  <script src="./timetable.js?v=20261015" defer></script>
 </body>
 </html>
