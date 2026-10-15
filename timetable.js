@@ -86,8 +86,16 @@
     banner.innerHTML = next.length
       ? `<strong>次の授業 ${remaining}</strong>${next.map(e => `<p><b>${escapeHtml(e.room)}</b> ／ ${escapeHtml(e.name)}<br><small>${e.offset === 0 ? "今日" : e.offset === 1 ? "明日" : `${e.day}曜日`}・${e.period}限（${PERIOD_TIMES[e.period].join("〜")}）</small></p>`).join("")}<small>登録した通常の時間割に基づく案内です。休講・補講・教室変更・授業振替は反映されません。</small>`
       : "今後1週間に登録された次の授業はありません。";
-    $("personalUpcoming").innerHTML = (current.length ? card("現在の授業", current) : "<p>現在、登録された授業はありません。</p>")
-      + (next.length ? card(`次の授業 ${remaining}`, next) : "<p>今後1週間に登録された授業はありません。</p>")
+    const week = events.filter(e => (e.offset > 0 || e.start > minute) && (e.offset < 7 || e.start <= minute));
+    const weekDays = [...new Set(week.map(e => e.offset))];
+    const weekList = weekDays.map(offset => {
+      const dayParts = tokyoParts(new Date(todayDate.getTime() + offset * 86400000));
+      const label = `${Number(dayParts.month)}月${Number(dayParts.day)}日（${days[(today + offset) % 7]}）${offset === 0 ? "・今日" : offset === 1 ? "・明日" : ""}`;
+      return card(label, week.filter(e => e.offset === offset));
+    }).join("");
+    $("personalUpcoming").innerHTML = (current.length ? card("現在の授業", current) : "")
+      + "<h3>これから1週間の授業</h3>"
+      + (week.length ? weekList : "<p>今後1週間に登録された授業はありません。</p>")
       + "<small>日本時間・通常の曜日の時間割で案内しています。祝日・授業振替は反映されません。</small>";
   }
   $("editTimetable").addEventListener("click", () => { renderEntries(); dialog.showModal(); });
