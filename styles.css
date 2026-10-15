@@ -12,7 +12,8 @@
   --shadow: 0 16px 42px rgba(22, 49, 68, .10);
 }
 
-.personal-panel { margin-bottom: 24px; }
+.personal-panel { margin-top: 42px; }
+.search-panel.personal-panel::after { display: none; }
 .personal-panel h2 { font-size: 1.4rem; }
 #personalUpcoming { margin-top: 18px; overflow-wrap: anywhere; }
 .personal-class { padding: 12px 16px; margin: 12px 0; background: var(--teal-soft); border-radius: 12px; }
