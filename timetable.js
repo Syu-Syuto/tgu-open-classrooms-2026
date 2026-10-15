@@ -35,6 +35,12 @@
       <p class="term-auto-note">2026年度用。同じ端末・ブラウザで利用できます。サイトデータの削除で時間割も消えます。</p>
     </div>`;
   document.body.append(dialog);
+  const seasonalClear = document.createElement("button");
+  seasonalClear.type = "button";
+  seasonalClear.id = "seasonalClearTimetable";
+  seasonalClear.textContent = "学期末：時間割をすべて削除";
+  seasonalClear.hidden = true;
+  $("personalUpcoming").after(seasonalClear);
   function persist(next) {
     try { localStorage.setItem(KEY, JSON.stringify(next)); }
     catch { $("personalMessage").textContent = "保存できませんでした。ブラウザの保存設定や空き容量をご確認ください。"; return false; }
@@ -46,6 +52,9 @@
     $("clearTimetable").disabled = !entries.length;
   }
   function renderUpcoming(date = new Date()) {
+    const calendar = tokyoParts(date);
+    const monthDay = Number(calendar.month) * 100 + Number(calendar.day);
+    seasonalClear.hidden = !entries.length || !((monthDay >= 710 && monthDay <= 831) || (monthDay >= 201 && monthDay <= 331));
     if (storageError) { $("personalUpcoming").textContent = storageError; return; }
     if (!entries.length) { $("personalUpcoming").textContent = "「登録・編集」から時間割を登録すると、次の授業と教室を表示します。"; return; }
     const parts = tokyoParts(date), resolved = resolveTerm(date);
@@ -96,7 +105,13 @@
     }
     if (remove && confirm("この授業を時間割から削除しますか？") && persist(entries.filter(e => e.id !== remove.dataset.delete))) { resetForm(); $("personalMessage").textContent = "削除しました。"; }
   });
-  $("clearTimetable").addEventListener("click", () => { if (confirm("このブラウザに保存した時間割をすべて削除しますか？") && persist([])) { resetForm(); $("personalMessage").textContent = "時間割をすべて削除しました。"; } });
+  function clearAll() {
+    if (confirm("このブラウザに保存した全学期の時間割をすべて削除しますか？この操作は元に戻せません。") && persist([])) {
+      resetForm(); $("personalMessage").textContent = "時間割をすべて削除しました。";
+    }
+  }
+  $("clearTimetable").addEventListener("click", clearAll);
+  seasonalClear.addEventListener("click", clearAll);
   let matches = [];
   $("courseSearch").addEventListener("input", () => {
     const query = $("courseSearch").value.trim().toLocaleLowerCase();
