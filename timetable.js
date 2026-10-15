@@ -52,13 +52,17 @@
     $("clearTimetable").disabled = !entries.length;
   }
   function renderUpcoming(date = new Date()) {
+    const banner = $("nextClassBanner");
+    banner.hidden = !entries.length;
+    banner.textContent = "次の授業を確認しています。";
     const calendar = tokyoParts(date);
     const monthDay = Number(calendar.month) * 100 + Number(calendar.day);
     seasonalClear.hidden = !entries.length || !((monthDay >= 710 && monthDay <= 831) || (monthDay >= 201 && monthDay <= 331));
-    if (storageError) { $("personalUpcoming").textContent = storageError; return; }
+    if (storageError) { banner.hidden = true; $("personalUpcoming").textContent = storageError; return; }
     if (!entries.length) { $("personalUpcoming").textContent = "「登録・編集」から時間割を登録すると、次の授業と教室を表示します。"; return; }
     const parts = tokyoParts(date), resolved = resolveTerm(date);
     if (!resolved.isInSession || !(Number(parts.year) === 2026 || (Number(parts.year) === 2027 && Number(parts.month) <= 2))) {
+      banner.textContent = "現在は2026年度の授業期間外です。登録した時間割はページ下部から確認できます。";
       $("personalUpcoming").textContent = "2026年度の授業期間外です。登録した時間割は「登録・編集」から確認できます。"; return;
     }
     const today = days.indexOf(japaneseDay(date)), minute = Number(parts.hour) * 60 + Number(parts.minute);
@@ -79,6 +83,9 @@
     const next = nextEvent ? events.filter(e => e.offset === nextEvent.offset && e.start === nextEvent.start) : [];
     const card = (label, items) => `<div class="personal-class"><strong>${label}</strong>${items.map(e => `<p>${escapeHtml(e.name)} ／ <b>${escapeHtml(e.room)}</b><br><small>${e.offset === 0 ? "今日" : e.offset === 1 ? "明日" : `${e.day}曜日` }・${e.period}限（${PERIOD_TIMES[e.period].join("〜")}）</small></p>`).join("")}</div>`;
     const remaining = nextEvent && nextEvent.offset === 0 ? `開始まであと${nextEvent.start-minute}分` : "";
+    banner.innerHTML = next.length
+      ? `<strong>次の授業 ${remaining}</strong>${next.map(e => `<p><b>${escapeHtml(e.room)}</b> ／ ${escapeHtml(e.name)}<br><small>${e.offset === 0 ? "今日" : e.offset === 1 ? "明日" : `${e.day}曜日`}・${e.period}限（${PERIOD_TIMES[e.period].join("〜")}）</small></p>`).join("")}<small>登録した通常の時間割に基づく案内です。休講・補講・教室変更・授業振替は反映されません。</small>`
+      : "今後1週間に登録された次の授業はありません。";
     $("personalUpcoming").innerHTML = (current.length ? card("現在の授業", current) : "<p>現在、登録された授業はありません。</p>")
       + (next.length ? card(`次の授業 ${remaining}`, next) : "<p>今後1週間に登録された授業はありません。</p>")
       + "<small>日本時間・通常の曜日の時間割で案内しています。祝日・授業振替は反映されません。</small>";
@@ -133,6 +140,10 @@
   }).catch(() => { $("courseSearchNote").textContent = "授業データを読み込めませんでした。手入力で登録できます。"; });
   window.addEventListener("storage", event => { if (event.key === KEY || event.key === null) { try { const data = JSON.parse(localStorage.getItem(KEY) || "[]"); if (Array.isArray(data) && data.every(valid)) { entries = data; storageError = ""; renderEntries(); renderUpcoming(); } } catch {} } });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) renderUpcoming(); });
-  setInterval(renderUpcoming, 30000);
+  let displayedMinute = "";
+  setInterval(() => {
+    const minute = new Date().toISOString().slice(0, 16);
+    if (minute !== displayedMinute) { displayedMinute = minute; renderUpcoming(); }
+  }, 1000);
   renderUpcoming();
 })();
