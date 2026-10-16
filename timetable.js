@@ -44,7 +44,7 @@
   function persist(next) {
     try { localStorage.setItem(KEY, JSON.stringify(next)); }
     catch { $("personalMessage").textContent = "保存できませんでした。ブラウザの保存設定や空き容量をご確認ください。"; return false; }
-    entries = next; storageError = ""; renderEntries(); renderUpcoming(); return true;
+    entries = next; storageError = ""; renderEntries(); renderUpcoming(); window.dispatchEvent(new Event("timetablechange")); return true;
   }
   function resetForm() { editId = null; $("timetableForm").reset(); $("savePersonal").textContent = "追加する"; $("cancelPersonalEdit").hidden = true; }
   function renderEntries() {

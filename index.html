@@ -16,6 +16,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="東京学芸大学の2026年度の空き教室を、曜日・時限から簡単に検索できる非公式Webサイトです。">
   <meta name="theme-color" content="#12324b">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <title>東京学芸大学 空き教室検索｜2026年度・非公式</title>
   <link rel="canonical" href="https://syu-syuto.github.io/tgu-open-classrooms-2026/">
   <meta property="og:title" content="東京学芸大学 空き教室検索｜2026年度・非公式">
@@ -23,7 +25,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://syu-syuto.github.io/tgu-open-classrooms-2026/">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312324b'/%3E%3Cpath d='M15 18h34v30H15z' fill='%23fff'/%3E%3Cpath d='M22 25h7v7h-7zm13 0h7v7h-7zM22 37h7v7h-7zm13 0h7v11h-7z' fill='%230aa7a2'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css?v=20261015-2">
+  <link rel="stylesheet" href="./styles.css?v=20261017">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -117,6 +119,18 @@
       <div class="search-intro"><h2 id="personal-title">自分の時間割</h2><button id="editTimetable" class="now-button" type="button">登録・編集</button></div>
       <div id="personalUpcoming" role="status">登録した時間割から、現在・次の授業と教室を表示します。</div>
       <p class="term-auto-note">時間割はこの端末のブラウザ内に保存します。運営者には送信しません。休講・補講・教室変更は大学のお知らせをご確認ください。</p>
+      <details class="app-settings">
+        <summary>アプリのインストール・授業通知</summary>
+        <p>AndroidのChromeメニューから「アプリをインストール」を選べます。初回読み込み後は、通信できない場合も保存済みデータで利用できます。</p>
+        <button id="installApp" type="button" hidden>アプリをインストール</button>
+        <button id="updateApp" type="button" hidden>更新して再読み込み</button>
+        <p id="pwaStatus" role="status">アプリの準備中です。</p>
+        <button id="enableNotifications" type="button" disabled>授業通知を有効にする</button>
+        <button id="disableNotifications" type="button" hidden>授業通知を無効にする</button>
+        <p id="notificationStatus" role="status">通知は無効です。</p>
+        <p class="term-auto-note">通知は画面を開いている間の補助機能です。日本時間の平日5:00以降、その日の未開始の登録授業だけを表示します。開始時に次の授業へ切り替え、最後の授業が始まると終了します。</p>
+        <p class="term-auto-note">別アプリへの切り替え・画面ロック時は通知を閉じます。バックグラウンドや完全終了中の自動表示・毎分更新は行いません。強制終了などでは古い通知が残る場合があるため、通知の更新時刻と開始時刻を確認し、不要な通知は手動で消してください。通知の見え方・省略は端末により異なります。休講・補講・祝日の判定には対応していません。</p>
+      </details>
     </section>
   </main>
 
@@ -135,6 +149,8 @@
   </dialog>
 
   <script src="./app.js?v=20260928" defer></script>
-  <script src="./timetable.js?v=20261015-5" defer></script>
+  <script src="./timetable.js?v=20261017" defer></script>
+  <script src="./notification-model.js?v=20261017" defer></script>
+  <script src="./pwa.js?v=20261017" defer></script>
 </body>
 </html>

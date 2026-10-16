@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "Open-Classrooms｜東京学芸大学 空き教室検索（非公式）",
+  "short_name": "Open-Classrooms",
+  "description": "東京学芸大学の空き教室検索と、自分の時間割を確認できる非公式ツール",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f8fa",
+  "theme_color": "#12324b",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
