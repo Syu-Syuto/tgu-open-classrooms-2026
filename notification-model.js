@@ -1,5 +1,5 @@
 /* Uses only the user's saved timetable. Times and term rules come from app.js. */
-function nextNotificationClass(entries, date = new Date()) {
+function nextNotificationClass(entries, date = new Date(), background = false) {
   const p = tokyoParts(date), day = japaneseDay(date);
   const minute = Number(p.hour) * 60 + Number(p.minute);
   const session = resolveTerm(date);
@@ -18,8 +18,11 @@ function nextNotificationClass(entries, date = new Date()) {
   const simultaneous = upcoming.filter(e => e.startMinute === first.startMinute);
   const startAt = new Date(`${p.year}-${p.month}-${p.day}T${first.time}:00+09:00`).getTime();
   return {
-    title: `次の授業まであと${first.startMinute - minute}分`,
-    body: `${first.time}開始 ｜ ${simultaneous.map(e => e.room).join("／")}\n${simultaneous.map(e => e.name).join("／")}\n${p.hour}:${p.minute}更新・起動中のみ更新`,
+    title: background ? `${first.time}開始 ｜ ${simultaneous.map(e => e.room).join("／")}` : `次の授業まであと${first.startMinute - minute}分`,
+    body: background
+      ? `${simultaneous.map(e => e.name).join("／")}\n最新の授業情報はタップして確認（${p.hour}:${p.minute}時点）`
+      : `${first.time}開始 ｜ ${simultaneous.map(e => e.room).join("／")}\n${simultaneous.map(e => e.name).join("／")}\n${p.hour}:${p.minute}更新・起動中のみ更新`,
+    mode: background ? "static" : "countdown",
     startAt,
     updatedAt: date.getTime(),
   };

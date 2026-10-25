@@ -129,7 +129,7 @@
         <button id="disableNotifications" type="button" hidden>授業通知を無効にする</button>
         <p id="notificationStatus" role="status">通知は無効です。</p>
         <p class="term-auto-note">通知は画面を開いている間の補助機能です。日本時間の平日5:00以降、その日の未開始の登録授業だけを表示します。開始時に次の授業へ切り替え、最後の授業が始まると終了します。</p>
-        <p class="term-auto-note">別アプリへの切り替え・画面ロック時は通知を閉じます。バックグラウンドや完全終了中の自動表示・毎分更新は行いません。強制終了などでは古い通知が残る場合があるため、通知の更新時刻と開始時刻を確認し、不要な通知は手動で消してください。通知の見え方・省略は端末により異なります。休講・補講・祝日の判定には対応していません。</p>
+        <p class="term-auto-note">最小化・別アプリへの切り替え・画面ロック時は「開始時刻・教室・科目名」の通知を残します。再表示すると残り時間と次の授業を確認し直します。バックグラウンドや完全終了中の自動更新・削除は保証できないため、開始済みの授業の通知が残る場合があります。通知をタップして最新情報を確認するか、不要な通知を手動で消してください。通知の見え方・省略は端末により異なります。休講・補講・祝日の判定には対応していません。</p>
       </details>
     </section>
   </main>
@@ -150,7 +150,7 @@
 
   <script src="./app.js?v=20260928" defer></script>
   <script src="./timetable.js?v=20261017" defer></script>
-  <script src="./notification-model.js?v=20261017" defer></script>
-  <script src="./pwa.js?v=20261017" defer></script>
+  <script src="./notification-model.js?v=20261025" defer></script>
+  <script src="./pwa.js?v=20261025" defer></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 "use strict";
-const CACHE = "tgu-open-classrooms-pwa-20261017-1";
+const CACHE = "tgu-open-classrooms-pwa-20261025-1";
 const ROOT = new URL("./", self.location.href);
 const TAG = "tgu-open-classrooms-next-class";
 const FILES = ["./", "index.html", "styles.css", "app.js", "timetable.js", "notification-model.js", "pwa.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "data/room-schedule-2026.json", "data/rooms-2026.json"];
@@ -42,8 +42,11 @@ self.addEventListener("message", event => {
     const payload = event.data.payload, now = Date.now();
     const clients = await self.clients.matchAll({type:"window",includeUncontrolled:true});
     const visible = clients.some(client => client.url.startsWith(ROOT.href) && client.visibilityState === "visible");
-    if (!payload || !visible || !Number.isFinite(payload.startAt) || payload.startAt <= now
+    if (!payload || !Number.isFinite(payload.startAt) || payload.startAt <= now
       || !Number.isFinite(payload.updatedAt) || Math.abs(now-payload.updatedAt)>65000) { await closeNotifications(); return; }
+    // A foreground update may arrive just after minimization; retain the existing
+    // notification until the following static update arrives instead of closing it.
+    if (!visible && payload.mode !== "static") return;
     const formatter = new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",weekday:"short",hour:"2-digit",hourCycle:"h23"});
     const parts = date => Object.fromEntries(formatter.formatToParts(date).map(p=>[p.type,p.value]));
     const current = parts(now), start = parts(payload.startAt);
@@ -62,7 +65,7 @@ self.addEventListener("notificationclick", event => {
   event.waitUntil((async () => {
     const clients = await self.clients.matchAll({type:"window",includeUncontrolled:true});
     const client = clients.find(item => item.url.startsWith(ROOT.href));
-    if (client) return client.focus();
+    if (client) { await client.focus(); client.postMessage({type:"REFRESH_CLASS_NOTIFICATION"}); return; }
     return self.clients.openWindow(ROOT.href);
   })());
 });

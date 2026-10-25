@@ -11,6 +11,12 @@
     $("enableNotifications").hidden = enabled;
     $("disableNotifications").hidden = !enabled;
   }
+  function notificationPayload(background = document.hidden) {
+    if (!enabled || !supported || Notification.permission !== "granted") return null;
+    const entries = JSON.parse(localStorage.getItem(TIMETABLE) || "[]");
+    if (!Array.isArray(entries)) throw new Error("時間割を読み込めませんでした");
+    return nextNotificationClass(entries, new Date(), background);
+  }
   async function sendNotification(payload) {
     if (!registration?.active) return;
     await new Promise((resolve, reject) => {
@@ -25,18 +31,13 @@
     if (busy) { pending = true; return; }
     busy = true;
     try {
-      let payload = null;
-      if (enabled && supported && Notification.permission === "granted" && !document.hidden) {
-        const entries = JSON.parse(localStorage.getItem(TIMETABLE) || "[]");
-        if (!Array.isArray(entries)) throw new Error("時間割を読み込めませんでした");
-        payload = nextNotificationClass(entries);
-      }
+      const payload = notificationPayload();
       const signature = JSON.stringify(payload);
       if (signature !== lastSignature) { await sendNotification(payload); lastSignature = signature; }
       $("notificationStatus").textContent = !supported ? "このブラウザは授業通知に対応していません。"
         : !enabled ? "通知は無効です。"
         : Notification.permission !== "granted" ? "通知権限がありません。ブラウザのサイト設定をご確認ください。"
-        : document.hidden ? "バックグラウンドのため通知を停止しています。"
+        : document.hidden && payload ? "最小化中は開始時刻・教室・科目名の通知を残します。再表示すると最新情報に更新します。"
         : payload ? "授業通知は有効です。画面を開いている間、毎分更新します。"
         : "通知は有効です。今は通知対象の授業がありません（平日5:00以降・当日の未開始授業）。";
     } catch {
@@ -73,6 +74,9 @@
   });
   if (!("serviceWorker" in navigator)) { $("pwaStatus").textContent = "このブラウザはアプリ機能に対応していません。通常のサイトとして利用できます。"; return; }
   navigator.serviceWorker.addEventListener("controllerchange", () => { if (updating) location.reload(); });
+  navigator.serviceWorker.addEventListener("message", event => {
+    if (event.data?.type === "REFRESH_CLASS_NOTIFICATION") { lastSignature = ""; refresh(); }
+  });
   navigator.serviceWorker.register("./sw.js", {scope:"./", updateViaCache:"none"}).then(async reg => {
     registration = reg;
     const showUpdate = () => { if (reg.waiting) { $("updateApp").hidden = false; $("pwaStatus").textContent = "新しい版があります。保存済みの時間割を引き継いで更新できます。編集中の入力は保存してから更新してください。"; } };
@@ -83,12 +87,14 @@
     buttons(); await refresh();
   }).catch(() => { $("pwaStatus").textContent = "アプリの準備に失敗しました。オンラインで再読み込みしてください。通常の検索は引き続き利用できます。"; });
   document.addEventListener("visibilitychange", () => { lastSignature = ""; refresh(); });
-  window.addEventListener("pagehide", () => { registration?.active?.postMessage({type:"CLASS_NOTIFICATION",payload:null}); });
+  window.addEventListener("pagehide", () => {
+    try { registration?.active?.postMessage({type:"CLASS_NOTIFICATION",payload:notificationPayload(true)}); } catch {}
+  });
   window.addEventListener("storage", event => {
     if (event.key === SETTING || event.key === null) { try { enabled = localStorage.getItem(SETTING) === "true"; } catch { enabled = false; } }
     lastSignature = ""; refresh();
   });
   window.addEventListener("timetablechange", () => { lastSignature = ""; refresh(); });
   let minute = "";
-  setInterval(() => { const current = new Date().toISOString().slice(0,16); if (current !== minute) { minute = current; refresh(); } }, 1000);
+  setInterval(() => { if (document.hidden) return; const current = new Date().toISOString().slice(0,16); if (current !== minute) { minute = current; refresh(); } }, 1000);
 })();
