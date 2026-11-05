@@ -1,5 +1,5 @@
 "use strict";
-const CACHE = "tgu-open-classrooms-pwa-20261025-1";
+const CACHE = "tgu-open-classrooms-pwa-20261105-1";
 const ROOT = new URL("./", self.location.href);
 const TAG = "tgu-open-classrooms-next-class";
 const FILES = ["./", "index.html", "styles.css", "app.js", "timetable.js", "notification-model.js", "pwa.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "data/room-schedule-2026.json", "data/rooms-2026.json"];
