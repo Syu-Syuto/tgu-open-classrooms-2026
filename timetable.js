@@ -31,8 +31,15 @@
         <button class="now-button" id="savePersonal" type="submit">追加する</button><button id="cancelPersonalEdit" type="button" hidden>編集をやめる</button>
       </form>
       <p id="personalMessage" role="status"></p><div id="personalEntries"></div>
+      <details class="timetable-transfer">
+        <summary>時間割を別の端末へ移す・バックアップ</summary>
+        <p>この端末でJSONを書き出し、ファイルを別の端末へ送って、同じサイトから読み込んでください。</p>
+        <button id="exportTimetable" type="button">JSONを書き出す</button>
+        <label class="field">JSONを読み込む<input id="importTimetable" type="file" accept=".json,application/json" aria-describedby="timetableTransferNote"></label>
+        <p id="timetableTransferNote" class="term-auto-note">読み込むと全学期の時間割を置き換えます。自動同期はされません。ファイルには授業名・教室が含まれるため、共有先にご注意ください。</p>
+      </details>
       <button id="clearTimetable" type="button">時間割をすべて削除</button>
-      <p class="term-auto-note">2026年度用。同じ端末・ブラウザで利用できます。サイトデータの削除で時間割も消えます。</p>
+      <p class="term-auto-note">2026年度用。このブラウザに保存されます。サイトデータの削除で時間割も消えるため、JSONでバックアップできます。</p>
     </div>`;
   document.body.append(dialog);
   const seasonalClear = document.createElement("button");
@@ -50,7 +57,45 @@
   function renderEntries() {
     $("personalEntries").innerHTML = entries.length ? entries.map(e => `<div class="personal-entry"><div><strong>${escapeHtml(e.name)}</strong><br>${escapeHtml(e.term)}・${e.day}曜${e.period}限 ／ ${escapeHtml(e.room)}</div><div><button type="button" data-edit="${escapeHtml(e.id)}">編集</button> <button type="button" data-delete="${escapeHtml(e.id)}">削除</button></div></div>`).join("") : "<p>時間割はまだ登録されていません。</p>";
     $("clearTimetable").disabled = !entries.length;
+    $("exportTimetable").disabled = !entries.length;
   }
+  $("exportTimetable").addEventListener("click", () => {
+    if (!entries.length) return;
+    const data = { format: "tgu-personal-timetable", version: 1, academicYear: 2026,
+      exportedAt: new Date().toISOString(), entries };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url; link.download = "tgu-timetable-2026.json";
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    $("personalMessage").textContent = "JSONの書き出しを開始しました。保存したファイルを別の端末で読み込めます。";
+  });
+  $("importTimetable").addEventListener("change", async event => {
+    const input = event.target, file = input.files[0];
+    input.value = "";
+    if (!file) return;
+    input.disabled = true;
+    try {
+      if (file.size > 1024 * 1024) throw new Error("ファイルは1MB以下のJSONを選んでください。");
+      let data;
+      try { data = JSON.parse(await file.text()); }
+      catch { throw new Error("JSONを読み込めませんでした。書き出したファイルを選び直してください。"); }
+      if (!data || data.format !== "tgu-personal-timetable" || data.version !== 1 || data.academicYear !== 2026) {
+        throw new Error("このファイルは対応する2026年度の時間割JSONではありません。");
+      }
+      if (!Array.isArray(data.entries) || data.entries.length > 1000
+        || !data.entries.every(e => valid(e) && e.id.trim() && e.id.length <= 100 && e.name.trim() && e.room.trim())
+        || new Set(data.entries.map(e => e.id)).size !== data.entries.length) {
+        throw new Error("時間割の授業データが不正です。登録済みの時間割は変更していません。");
+      }
+      const next = data.entries.map(({ id, term, day, period, name, room }) => ({ id, term, day, period, name, room }));
+      if (!confirm(`${next.length}件の授業を読み込みます。${entries.length ? `このブラウザの全学期の時間割（${entries.length}件）を置き換えます。必要なら先にJSONを書き出してください。` : "このブラウザに保存します。"}よろしいですか？`)) {
+        $("personalMessage").textContent = "読み込みをキャンセルしました。"; return;
+      }
+      if (persist(next)) { resetForm(); $("personalMessage").textContent = `${next.length}件の授業を読み込み、このブラウザに保存しました。`; }
+    } catch (error) { $("personalMessage").textContent = error.message; }
+    finally { input.disabled = false; }
+  });
   function renderUpcoming(date = new Date()) {
     const banner = $("nextClassBanner");
     banner.hidden = !entries.length;
