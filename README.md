@@ -49,10 +49,21 @@
 
 ## 確認
 
+### iPhone・iPadの授業通知
+
+iOS / iPadOS 16.4以降で、共有メニューから「ホーム画面に追加」し、そのアイコンから起動してください。「アプリのインストール・授業通知」の「授業通知を有効にする」を押して許可します。通知センターへの表示や集中モードは端末の「設定」→「通知」で確認してください。ホーム画面アプリに授業がない場合はJSONで時間割を移せます。
+
+iOSでは「開始時刻・教室・科目名」の固定形式をアプリ起動中から使用し、同じ授業を毎分通知し直しません。Androidの起動中の残り時間表示と最小化時の固定表示は維持しています。いずれも日本時間の平日5時以降・当日の未開始授業が対象です。
+
+バックグラウンドや完全終了中の自動切り替えは保証しません。iOSの通知センターに実際に表示されることは実機で確認してください。この変更はWeb Pushサーバーや購読・定期配信を追加するものではありません。アプリ終了中の自動配信には別途これらの仕組みが必要です。
+
+仕様参考: [WebKit: Web Push for Web Apps on iOS and iPadOS](https://webkit.org/blog/13878/)
+
 Node.jsの標準機能のみで入出力の回帰テストを実行できます。
 
 ```sh
 node --test tests/timetable-transfer.test.cjs
+node --test tests/ios-notifications.test.cjs
 node --check timetable.js
 node --check sw.js
 ```

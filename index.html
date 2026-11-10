@@ -122,13 +122,14 @@
       <p class="term-auto-note">時間割はこの端末のブラウザ内に保存します。運営者には送信しません。休講・補講・教室変更は大学のお知らせをご確認ください。</p>
       <details class="app-settings">
         <summary>アプリのインストール・授業通知</summary>
-        <p>AndroidのChromeメニューから「アプリをインストール」を選べます。初回読み込み後は、通信できない場合も保存済みデータで利用できます。</p>
+        <p>AndroidのChromeメニューから「アプリをインストール」を選べます。iPhone・iPadでは共有メニューの「ホーム画面に追加」で追加し、そのアイコンから開いてください。iOS / iPadOS 16.4以降では、アプリ内の「授業通知を有効にする」から通知を許可できます。初回読み込み後は、通信できない場合も保存済みデータで利用できます。</p>
         <button id="installApp" type="button" hidden>アプリをインストール</button>
         <button id="updateApp" type="button" hidden>更新して再読み込み</button>
         <p id="pwaStatus" role="status">アプリの準備中です。</p>
         <button id="enableNotifications" type="button" disabled>授業通知を有効にする</button>
         <button id="disableNotifications" type="button" hidden>授業通知を無効にする</button>
         <p id="notificationStatus" role="status">通知は無効です。</p>
+        <p class="term-auto-note">iPhone・iPadでは開始時刻・教室・科目名の通知を表示します。残り時間の毎分通知は行いません。ホーム画面アプリの時間割が空の場合は、JSON読み込みで移してください。通知が見えない場合は「設定」→「通知」でこのアプリの通知センター・ロック画面への表示と集中モードを確認してください。</p>
         <p class="term-auto-note">通知は画面を開いている間の補助機能です。日本時間の平日5:00以降、その日の未開始の登録授業だけを表示します。開始時に次の授業へ切り替え、最後の授業が始まると終了します。</p>
         <p class="term-auto-note">最小化・別アプリへの切り替え・画面ロック時は「開始時刻・教室・科目名」の通知を残します。再表示すると残り時間と次の授業を確認し直します。バックグラウンドや完全終了中の自動更新・削除は保証できないため、開始済みの授業の通知が残る場合があります。通知をタップして最新情報を確認するか、不要な通知を手動で消してください。通知の見え方・省略は端末により異なります。休講・補講・祝日の判定には対応していません。</p>
       </details>
@@ -152,6 +153,6 @@
   <script src="./app.js?v=20260928" defer></script>
   <script src="./timetable.js?v=20261111" defer></script>
   <script src="./notification-model.js?v=20261025" defer></script>
-  <script src="./pwa.js?v=20261025" defer></script>
+  <script src="./pwa.js?v=20261111-ios1" defer></script>
 </body>
 </html>

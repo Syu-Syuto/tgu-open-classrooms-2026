@@ -5,17 +5,27 @@
   const TIMETABLE = "tgu-personal-timetable-2026-v1";
   let registration, enabled = false, lastSignature = "", installPrompt, busy = false, pending = false;
   try { enabled = localStorage.getItem(SETTING) === "true"; } catch {}
-  const supported = "serviceWorker" in navigator && "Notification" in window && "PushManager" in window;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  // Local notifications use the Notifications API, not a Push subscription.
+  const supported = "serviceWorker" in navigator && "Notification" in window && (!isIOS || standalone);
+  const unsupportedMessage = isIOS && !standalone
+    ? "iPhone・iPadでは、共有メニューの「ホーム画面に追加」で追加し、そのアイコンから開いて通知を有効にしてください（iOS / iPadOS 16.4以降）。"
+    : isIOS ? "この端末では通知を利用できません。iOS / iPadOS 16.4以降に更新し、ホーム画面のアイコンから開いてください。"
+    : "このブラウザは授業通知に対応していません。";
   function buttons() {
     $("enableNotifications").disabled = !registration || !supported;
-    $("enableNotifications").hidden = enabled;
+    $("enableNotifications").hidden = enabled && supported;
     $("disableNotifications").hidden = !enabled;
   }
   function notificationPayload(background = document.hidden) {
     if (!enabled || !supported || Notification.permission !== "granted") return null;
     const entries = JSON.parse(localStorage.getItem(TIMETABLE) || "[]");
     if (!Array.isArray(entries)) throw new Error("時間割を読み込めませんでした");
-    return nextNotificationClass(entries, new Date(), background);
+    // iOS suspends pages when hidden; show the durable time/room/course text
+    // while visible instead of relying on a last-second pagehide update.
+    return nextNotificationClass(entries, new Date(), isIOS || background);
   }
   async function sendNotification(payload) {
     if (!registration?.active) return;
@@ -32,11 +42,14 @@
     busy = true;
     try {
       const payload = notificationPayload();
-      const signature = JSON.stringify(payload);
+      const signature = JSON.stringify(isIOS && payload
+        ? { title: payload.title, course: payload.body.split("\n")[0], startAt: payload.startAt }
+        : payload);
       if (signature !== lastSignature) { await sendNotification(payload); lastSignature = signature; }
-      $("notificationStatus").textContent = !supported ? "このブラウザは授業通知に対応していません。"
+      $("notificationStatus").textContent = !supported ? unsupportedMessage
         : !enabled ? "通知は無効です。"
         : Notification.permission !== "granted" ? "通知権限がありません。ブラウザのサイト設定をご確認ください。"
+        : isIOS && payload ? "通知に開始時刻・教室・科目名を表示しました。iOSでは残り時間を毎分通知しません。アプリを開くと最新の授業に更新します。"
         : document.hidden && payload ? "最小化中は開始時刻・教室・科目名の通知を残します。再表示すると最新情報に更新します。"
         : payload ? "授業通知は有効です。画面を開いている間、毎分更新します。"
         : "通知は有効です。今は通知対象の授業がありません（平日5:00以降・当日の未開始授業）。";
@@ -52,7 +65,7 @@
       const permission = await Notification.requestPermission();
       if (permission !== "granted") { $("notificationStatus").textContent = "通知は許可されませんでした。必要な場合はブラウザのサイト設定から許可してください。"; return; }
       localStorage.setItem(SETTING, "true"); enabled = true; lastSignature = ""; await refresh();
-    } catch { $("notificationStatus").textContent = "通知設定を保存できませんでした。"; }
+    } catch { $("notificationStatus").textContent = "通知を有効にできませんでした。ホーム画面から起動しているか、端末の通知設定をご確認ください。"; }
   });
   $("disableNotifications").addEventListener("click", async () => {
     enabled = false; lastSignature = "";
@@ -83,11 +96,15 @@
     showUpdate();
     reg.addEventListener("updatefound", () => { reg.installing?.addEventListener("statechange", showUpdate); });
     await navigator.serviceWorker.ready;
-    if (!reg.waiting) $("pwaStatus").textContent = "アプリの準備ができました。Chromeのメニューからインストールできます。";
+    if (!reg.waiting) $("pwaStatus").textContent = isIOS
+      ? standalone ? "ホーム画面アプリとして起動しています。授業通知を有効にできます（iOS / iPadOS 16.4以降）。"
+        : "共有メニューの「ホーム画面に追加」で追加し、そのアイコンから開いてください。通知にはiOS / iPadOS 16.4以降が必要です。"
+      : "アプリの準備ができました。Chromeのメニューからインストールできます。";
     buttons(); await refresh();
   }).catch(() => { $("pwaStatus").textContent = "アプリの準備に失敗しました。オンラインで再読み込みしてください。通常の検索は引き続き利用できます。"; });
   document.addEventListener("visibilitychange", () => { lastSignature = ""; refresh(); });
   window.addEventListener("pagehide", () => {
+    if (isIOS) return;
     try { registration?.active?.postMessage({type:"CLASS_NOTIFICATION",payload:notificationPayload(true)}); } catch {}
   });
   window.addEventListener("storage", event => {
